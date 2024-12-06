@@ -63,15 +63,13 @@ This project is an NBA results predictor that uses machine learning models to pr
 - **Disclaimer:** This predictor is for educational purposes only. Do not use it for betting or any other financial decisions.
 - The model has an average percentage deviation of approximately 25% for points and wins predictions. This means the predictions can be off by about 25% on average.
 ## Model Testing Results
-Accuracy of WL prediction: 0.569078947368421
-F1 score for WL prediction: 0.6260704091341579
-Precision for WL prediction: 0.6195856873822976
-Recall for WL prediction: 0.6326923076923077
-Confusion Matrix for WL prediction:
-[[190 202]
- [191 329]]
-Mean Squared Error for PTS prediction: 162.9600766765994
-Mean Squared Error for PTS_O prediction: 162.2703266502108
-Average percentage deviation for PTS: 9.103152069317767%
-Average percentage deviation for PTS_O: 9.20247428308317%
+- Accuracy of WL prediction: 57%
+- F1 score for WL prediction: 0.6260704091341579
+- Precision for WL prediction: 0.6195856873822976
+- Recall for WL prediction: 0.6326923076923077
+- Confusion Matrix for WL prediction:
+- [[190 202]
+- [191 329]]
+- Average percentage deviation for PTS: 9.103152069317767%
+- Average percentage deviation for PTS_OPPONENT: 9.20247428308317%
 
