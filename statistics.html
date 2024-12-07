@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NBA Statistics</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f7f7f7;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100vh;
+        }
+
+        h1 {
+            font-size: 36px;
+            color: #333;
+            margin-top: 40px;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .team-section {
+            background-color: #fff;
+            width: 80%;
+            max-width: 900px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .team-section h2 {
+            font-size: 28px;
+            color: #4CAF50;
+            margin-bottom: 15px;
+        }
+
+        .team-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .team-info {
+            text-align: center;
+        }
+
+        .team-info img {
+            width: 120px;
+            height: 120px;
+            margin-top: 10px;
+            border-radius: 10px;
+        }
+
+        .games-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 100%;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .game-stats {
+            display: flex;
+            justify-content: space-between;
+            gap: 30px;
+            width: 100%;
+            padding: 15px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .game-stats div {
+            width: 45%;
+            text-align: center;
+        }
+
+        .game-stats p {
+            font-size: 16px;
+            color: #555;
+            margin: 5px 0;
+            white-space: nowrap; /* Prevents overflow of text */
+        }
+
+        /* H2H Section Styles */
+        .h2h-section {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+            align-items: center;
+            margin-top: 40px;
+        }
+
+        .h2h-card {
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 80%; /* Adjust the width to make it fit well */
+            text-align: center;
+            white-space: nowrap; /* Prevents overflow of text */
+        }
+
+        .h2h-card p {
+            font-size: 16px;
+            color: #555;
+            margin: 5px 0;
+        }
+
+        .h2h-card strong {
+            font-size: 18px;
+            color: #333;
+        }
+
+        .result-win {
+            color: green;
+        }
+
+        .result-loss {
+            color: red;
+        }
+
+        button {
+            padding: 12px 20px;
+            font-size: 18px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 30px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            font-size: 14px;
+            color: #888;
+        }
+
+        /* Last 5 Games Section - Flexbox */
+        .last-5-games-section {
+            display: flex;
+            justify-content: space-between;
+            gap: 40px;
+            margin-top: 40px;
+            width: 100%;
+        }
+
+        .last-5-games-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 45%;
+        }
+
+        .last-5-game {
+            background-color: #fff;
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            white-space: nowrap; /* Prevents overflow of text */
+        }
+
+        .last-5-game p {
+            font-size: 16px;
+            color: #555;
+            margin: 5px 0;
+        }
+
+        /* Centering the headings for the games */
+        .games-heading {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+            font-size: 22px;
+            color: #4CAF50;
+            font-weight: bold;
+        }
+
+        /* Centered heading for Last 5 Games */
+        .last-5-games-heading {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #4CAF50;
+        }
+    </style>
+</head>
+<body>
+    <h1>LAST GAMES STATS</h1>
+
+    <!-- Team Section -->
+    <div class="team-section">
+        <div class="team-container">
+            <!-- Team 1 (Home Team) -->
+            <div class="team-info">
+                <p><strong>{{ home_team }}</strong></p>
+                <img src="{{ url_for('static', filename='logos/' + home_team|replace(' ', '-')|lower + '-logo.png') }}" alt="{{ home_team }} Logo">
+            </div>
+
+            <!-- Team 2 (Away Team) -->
+            <div class="team-info">
+                <p><strong>{{ away_team }}</strong></p>
+                <img src="{{ url_for('static', filename='logos/' + away_team|replace(' ', '-')|lower + '-logo.png') }}" alt="{{ away_team }} Logo">
+            </div>
+        </div>
+    </div>
+
+    <!-- H2H Section -->
+    <div class="games-heading">
+        <h2>H2H GAMES</h2>
+    </div>
+    <div class="h2h-section">
+        <!-- Display the last H2H games in a single large flexbox column -->
+        {% for game in last_5_h2h %}
+            <div class="h2h-card">
+                <p><strong>{{ game[0] }}</strong></p>
+                <p>{{ game[1] }} {{ game[2] }} - {{ game[3] }} {{ game[4] }}</p>
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- Last 5 Games Section -->
+    <div class="last-5-games-heading">
+        <h2>Last 5 Games</h2>
+    </div>
+    <div class="last-5-games-section">
+        <div class="last-5-games-container">
+            <h3>{{ home_team }} Last 5 Games</h3>
+            {% for game in last_5_games_home %}
+                <div class="last-5-game">
+                    <p>{{ game[0] }}: {{ game[1] }} {{ game[2] }} - {{ game[3] }} {{ game[4] }}
+                    <span class="{% if game[5] == 'W' %}result-win{% else %}result-loss{% endif %}">{{ game[5] }}</span></p>
+                </div>
+            {% else %}
+                <p>No games available</p>
+            {% endfor %}
+        </div>
+
+        <div class="last-5-games-container">
+            <h3>{{ away_team }} Last 5 Games</h3>
+            {% for game in last_5_games_away %}
+                <div class="last-5-game">
+                    <p>{{ game[0] }}: {{ game[1] }} {{ game[2] }} - {{ game[3] }} {{ game[4] }}
+                    <span class="{% if game[5] == 'W' %}result-win{% else %}result-loss{% endif %}">{{ game[5] }}</span></p>
+                </div>
+            {% else %}
+                <p>No games available</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <button onclick="window.history.back()">Back</button>
+
+    <div class="footer">
+        <p>V1.1 Model and tested by @vikase</p>
+    </div>
+</body>
+</html>

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NBA Results Predictor - Prediction</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f4f4f9;
+        }
+
+        h1 {
+            font-size: 28px;
+            margin: 20px;
+            text-align: center;
+            color: #333;
+        }
+
+        .team-container {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin: 15px;
+            width: 80%;
+            max-width: 800px;
+        }
+
+        .team-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            margin-bottom: 20px;
+            width: 45%;
+        }
+
+        .team-box img {
+            width: 80px;
+            height: 80px;
+            margin-top: 10px;
+        }
+
+        .team-box p {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .prediction-container {
+            margin: 30px;
+            text-align: center;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            max-width: 600px;
+        }
+
+        .prediction-container p {
+            font-size: 22px;
+            color: #333;
+            margin: 10px 0;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        button {
+            padding: 12px 20px;
+            font-size: 18px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 200px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        footer {
+            margin-top: 40px;
+            font-size: 14px;
+            color: #888888;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .team-container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .prediction-container {
+                width: 90%;
+            }
+
+            .button-container button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>NBA Results Predictor</h1>
+
+    <div class="team-container">
+        <div class="team-box">
+            <p><strong>Home Team:</strong></p>
+            <img src="{{ url_for('static', filename='logos/' + home_team|replace(' ', '-')|lower + '-logo.png') }}" alt="{{ home_team }} Logo">
+            <p>{{ home_team }}</p>
+        </div>
+        <div class="team-box">
+            <p><strong>Away Team:</strong></p>
+            <img src="{{ url_for('static', filename='logos/' + away_team|replace(' ', '-')|lower + '-logo.png') }}" alt="{{ away_team }} Logo">
+            <p>{{ away_team }}</p>
+        </div>
+    </div>
+
+    <p><strong>Date:</strong> {{ date }}</p>
+
+    <div class="prediction-container">
+        <p><strong>Win Prediction:</strong> {{ wl_prediction }}</p>
+        <p><strong>Score Prediction:</strong> {{ pts_prediction_transformed }} : {{ pts_o_prediction_transformed }}</p>
+    </div>
+
+    <div class="button-container">
+        <a href="{{ url_for('statistics', home_team=home_team, away_team=away_team, date=date) }}">
+    <button>Statistics</button>
+</a>
+        <a href="{{ url_for('home') }}">
+            <button>Back</button>
+        </a>
+    </div>
+
+    <footer>
+        <p>V1.1 Model made and tested by @vikiase</p>
+    </footer>
+</body>
+</html>
