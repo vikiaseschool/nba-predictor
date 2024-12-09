@@ -211,16 +211,13 @@
 <body>
     <h1>LAST GAMES STATS</h1>
 
-    <!-- Team Section -->
     <div class="team-section">
         <div class="team-container">
-            <!-- Team 1 (Home Team) -->
             <div class="team-info">
                 <p><strong>{{ home_team }}</strong></p>
                 <img src="{{ url_for('static', filename='logos/' + home_team|replace(' ', '-')|lower + '-logo.png') }}" alt="{{ home_team }} Logo">
             </div>
 
-            <!-- Team 2 (Away Team) -->
             <div class="team-info">
                 <p><strong>{{ away_team }}</strong></p>
                 <img src="{{ url_for('static', filename='logos/' + away_team|replace(' ', '-')|lower + '-logo.png') }}" alt="{{ away_team }} Logo">
@@ -233,47 +230,42 @@
         <h2>H2H GAMES</h2>
     </div>
     <div class="h2h-section">
-        <!-- Display the last H2H games in a single large flexbox column -->
         {% for game in last_5_h2h %}
             <div class="h2h-card">
                 <p><strong>{{ game[0] }}</strong></p>
-                <p>{{ game[1] }} {{ game[2] }} - {{ game[3] }} {{ game[4] }}</p>
+                <p>{{ game[1] }} {{ game[2] }} : {{ game[4] }} {{ game[3] }}</p>
             </div>
         {% endfor %}
     </div>
 
-    <!-- Last 5 Games Section -->
-    <div class="last-5-games-heading">
-        <h2>Last 5 Games</h2>
+<div class="last-5-games-heading">
+    <h2>LAST 5 GAMES</h2>
+</div>
+<div class="last-5-games-section">
+    <div class="last-5-games-container">
+        {% for game in last_5_games_home %}
+            <div class="last-5-game">
+                <p>{{ game[0] }}: {{ game[1] }} {{ game[2] }} : {{ game[4] }} {{ game[3] }}
+                <span class="{% if game[5] == 'W' %}result-win{% else %}result-loss{% endif %}">{{ game[5] }}</span></p>
+            </div>
+        {% else %}
+            <p>No games available</p>
+        {% endfor %}
     </div>
-    <div class="last-5-games-section">
-        <div class="last-5-games-container">
-            <h3>{{ home_team }} Last 5 Games</h3>
-            {% for game in last_5_games_home %}
-                <div class="last-5-game">
-                    <p>{{ game[0] }}: {{ game[1] }} {{ game[2] }} - {{ game[3] }} {{ game[4] }}
-                    <span class="{% if game[5] == 'W' %}result-win{% else %}result-loss{% endif %}">{{ game[5] }}</span></p>
-                </div>
-            {% else %}
-                <p>No games available</p>
-            {% endfor %}
-        </div>
 
-        <div class="last-5-games-container">
-            <h3>{{ away_team }} Last 5 Games</h3>
-            {% for game in last_5_games_away %}
-                <div class="last-5-game">
-                    <p>{{ game[0] }}: {{ game[1] }} {{ game[2] }} - {{ game[3] }} {{ game[4] }}
-                    <span class="{% if game[5] == 'W' %}result-win{% else %}result-loss{% endif %}">{{ game[5] }}</span></p>
-                </div>
-            {% else %}
-                <p>No games available</p>
-            {% endfor %}
-        </div>
+    <div class="last-5-games-container">
+        {% for game in last_5_games_away %}
+            <div class="last-5-game">
+                <p>{{ game[0] }}: {{ game[1] }} {{ game[2] }} - {{ game[3] }} {{ game[4] }}
+                <span class="{% if game[5] == 'W' %}result-win{% else %}result-loss{% endif %}">{{ game[5] }}</span></p>
+            </div>
+        {% else %}
+            <p>No games available</p>
+        {% endfor %}
     </div>
+</div>
 
     <button onclick="window.history.back()">Back</button>
-
     <div class="footer">
         <p>V1.1 Model and tested by @vikase</p>
     </div>
