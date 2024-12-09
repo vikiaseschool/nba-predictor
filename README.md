@@ -56,11 +56,11 @@ This project is an NBA results predictor that uses machine learning models to pr
 - Average percentage deviation for PTS_O: 9.2%
 
 ## UPDATE DESCRIPTIONS
-# V2 changes
+**V2 changes**
 - made the project public via vercel
 - added player points prediction
 
-# V1.1 changes
+**V1.1 changes**
 - repaired datasets, data are now more precise
 - better trained model, accuracy increase + 2%
 - added last 5 games stats
