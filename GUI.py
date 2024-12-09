@@ -1,8 +1,10 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, flash
 from datetime import datetime
 import main
 
 app = Flask(__name__)
+app.secret_key = 'mysecretkey_not_generated_with_AI'
+
 
 # Seznam týmů
 teams = [
@@ -18,24 +20,33 @@ teams = [
 def home():
     return render_template('web_gui.html', teams=teams)
 
-@app.route('/nextpage', methods=['POST'])
+@app.route('/nextpage', methods=['POST', 'GET'])
 def next_page():
+    # Handle GET requests to prevent errors when redirected
+    if request.method == 'GET':
+        flash("Please fill out the form before proceeding.", "error")
+        return redirect(url_for('home'))
+
     home_team = request.form.get('team1')
     away_team = request.form.get('team2')
     date = request.form.get('date')
 
-    # Zavolání funkce pro získání predikce
-    wl_prediction, pts_prediction_transformed, pts_o_prediction_transformed = main.get_prediction(home_team, away_team, date)
-    if wl_prediction == 1:
-        wl_prediction = home_team
-    else:
-        wl_prediction = away_team
+    try:
+        # Call the prediction function
+        wl_prediction, pts_prediction_transformed, pts_o_prediction_transformed = main.get_prediction(
+            home_team, away_team, date
+        )
+        wl_prediction = home_team if wl_prediction == 1 else away_team
+    except Exception:
+        flash("Invalid Date, please try again.", "error")
+        return redirect(url_for('home'))
 
-    # Renderování stránky výsledků
+    # Render the result page if everything succeeds
     return render_template('result.html', home_team=home_team, away_team=away_team, date=date,
                            wl_prediction=wl_prediction,
                            pts_prediction_transformed=pts_prediction_transformed,
                            pts_o_prediction_transformed=pts_o_prediction_transformed)
+
 
 @app.route('/statistics')
 def statistics():
