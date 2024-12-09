@@ -59,6 +59,7 @@ This project is an NBA results predictor that uses machine learning models to pr
 **V2 changes**
 - made the project public via vercel
 - added player points prediction
+   - trained new model
 
 **V1.1 changes**
 - repaired datasets, data are now more precise
