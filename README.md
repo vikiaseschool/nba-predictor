@@ -1,4 +1,7 @@
-# NBA Results Predictor V1.1
+# NBA Results Predictor V2
+
+## WARNING!
+this application is only for educational purposes, please don't use it for betting. The model is not accurate enough and you may lose your money.
 
 ## Overview
 
@@ -52,11 +55,13 @@ This project is an NBA results predictor that uses machine learning models to pr
 - Average percentage deviation for PTS: 9.1%
 - Average percentage deviation for PTS_O: 9.2%
 
-## V1.1 changes
+## UPDATE DESCRIPTIONS
+# V2 changes
+- made the project public via vercel
+- added player points prediction
 
+# V1.1 changes
 - repaired datasets, data are now more precise
 - better trained model, accuracy increase + 2%
 - added last 5 games stats
 
-## WARNING!
-this application is only for educational purposes, please don't use it for betting. The model is not accurate enough and you may lose your money.
