@@ -1,7 +1,12 @@
 # NBA Results Predictor V2
 
 ## WARNING!
+
 this application is only for educational purposes, please don't use it for betting. The model is not accurate enough and you may lose your money.
+
+## Use of AI
+
+I used ChatGpt and Github copilot extension. Some parts of my code are optimalized by AI, usually when operating with large datasets. Also some comments or code parts might are upgraded by AI to make the code readable and structuable, but it is a minority of the code.
 
 ## Overview
 
