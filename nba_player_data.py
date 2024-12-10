@@ -363,6 +363,7 @@ def add_last_5():
     player_data.to_csv("players_stats_with_last_5.csv", index=False)
     print("Last 5 games averages added to players_stats_with_last_5.csv")
 
+#lot of comments, i have to test it...
 def merge_players_with_games():
     players = pd.read_csv("players_stats_with_last_5.csv")
     games = pd.read_csv("test_dataset.csv")
