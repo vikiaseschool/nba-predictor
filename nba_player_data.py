@@ -276,7 +276,6 @@ def get_player_logs():
             lineup_data = pd.read_csv(input_csv)
             team_players = lineup_data[lineup_data['TEAM_NAME'] == team_name]
             player_ids = team_players['PLAYER_ID'].tolist()
-            team_id_map = team_players.set_index('PLAYER_ID')['TEAM_ID'].to_dict()  # Precompute mapping
         except Exception as e:
             print(f"Error reading input file: {e}")
             return None
@@ -285,14 +284,14 @@ def get_player_logs():
 
         seasons = ['2023-24', '2024-25']
         all_player_stats = []
-
+        time.sleep(5)  # Sleep for 5 seconds to avoid rate limiting, API too slow :(
         for player_id in player_ids:
             for season in seasons:
                 for attempt in range(3):
                     try:
                         game_logs = PlayerGameLog(player_id=player_id, season=season).get_data_frames()[0]
-                        game_logs['TEAM_ID'] = team_id_map.get(player_id, None)  # Map TEAM_ID efficiently
                         all_player_stats.append(game_logs)
+                        print(f"Fetched data for Player ID {player_id}, Season {season}")
                         break
                     except Exception as e:
                         print(f"Error fetching data for Player ID {player_id}, Season {season}, attemp {attempt+1}: {e}")
@@ -307,18 +306,20 @@ def get_player_logs():
     stats = []
     for team in teams.get_teams():
         team_name = team['full_name']
-        print(f"Getting player logs for {team_name}")
-        combined_stats = create_team_player_performance("nba_starting_lineups.csv", team_name)
-        if combined_stats is not None:
-            stats.append(combined_stats)
+        print(f"Fetching data for {team_name}...")
+        team_stats = create_team_player_performance("nba_starting_lineups.csv", team_name)
+        if team_stats is not None:
+            team_stats['TEAM_NAME'] = team_name
+            stats.append(team_stats)
 
-    # Save the final combined DataFrame to CSV
     if stats:
         final_stats = pd.concat(stats, ignore_index=True)
         final_stats.to_csv("team_player_performance.csv", index=False)
         print("All team player performances saved to CSV.")
 
 def format_logs():
+    print("Formatting logs...")
+
     def get_player_name(player_id):
         all_players = players.get_players()
         player = next((player for player in all_players if player['id'] == player_id), None)
@@ -326,6 +327,11 @@ def format_logs():
             return player['full_name']
         else:
             return "Player not found"
+
+    def get_team_id_mapping():
+        lineup_data = pd.read_csv("nba_starting_lineups.csv")
+        return lineup_data.set_index('PLAYER_ID')['TEAM_ID'].to_dict()
+
 
     logs = pd.read_csv("team_player_performance.csv")
     logs = logs.drop_duplicates()
@@ -335,8 +341,10 @@ def format_logs():
     logs['WL'] = logs['WL'].replace({'W': 1, 'L': 0})
 
     logs = logs.drop(columns=['VIDEO_AVAILABLE', 'MATCHUP'])
-    logs.rename(columns={'Player_ID': 'PLAYER_ID'}, inplace=True)
-    logs.rename(columns={'Game_ID': 'GAME_ID'}, inplace=True)
+    logs.rename(columns={'Player_ID': 'PLAYER_ID', 'Game_ID': 'GAME_ID'}, inplace=True)
+    team_id_mapping = get_team_id_mapping()
+    logs['TEAM_ID'] = logs['PLAYER_ID'].map(team_id_mapping)
+
 
     logs.to_csv("players_stats_24-25_final.csv", index=False)
     print("Logs formatted and saved to players_stats_24-25_final.csv")
@@ -363,28 +371,23 @@ def add_last_5():
     player_data.to_csv("players_stats_with_last_5.csv", index=False)
     print("Last 5 games averages added to players_stats_with_last_5.csv")
 
-#lot of comments, i have to test it...
 def merge_players_with_games():
+    print("Merging players with games...")
     players = pd.read_csv("players_stats_with_last_5.csv")
     games = pd.read_csv("test_dataset.csv")
 
-    # Filter games to only include data from 2023-10-01 and newer
     games['GAME_DATE'] = pd.to_datetime(games['GAME_DATE'])
     games = games[games['GAME_DATE'] >= '2023-10-01']
 
-    # Create an empty list for the final merged data
     merged_data = []
 
-    # Iterate through the players
     for _, player_row in players.iterrows():
         player_team_id = player_row['TEAM_ID']
         player_game_date = player_row['GAME_DATE']
 
-        # Filter matching games
         matched_games = games[(games['GAME_DATE'] == player_game_date) & (games['TEAM_ID'] == player_team_id)]
 
         if not matched_games.empty:
-            # If TEAM_ID matches, add the stats as MATCH_{original_column_name}
             for _, game_row in matched_games.iterrows():
                 new_row = player_row.copy()
                 for col in game_row.index:
@@ -392,7 +395,6 @@ def merge_players_with_games():
                         new_row[f'MATCH_{col}'] = game_row[col]
                 merged_data.append(new_row)
         else:
-            # If TEAM_ID does not match, add opponent's stats
             for _, game_row in matched_games.iterrows():
                 new_row = player_row.copy()
                 new_row['SEASON_ID'] = game_row['SEASON_ID']
@@ -403,16 +405,17 @@ def merge_players_with_games():
                         new_row[f'MATCH_{col.replace("OPP_", "")}'] = game_row[col]
                 merged_data.append(new_row)
 
-    # Convert merged data into a DataFrame
     merged_df = pd.DataFrame(merged_data)
-
+    merged_df.drop(columns=['MATCH_GAME_ID', 'MATCH_SEASON_ID', 'MATCH_TEAM_ID', 'MATCH_TEAM_ABBREVIATION', 'MATCH_GAME_DATE', 'MATCH_MATCHUP'], inplace=True)
     # Save to CSV
     merged_df.to_csv('test_dataset_players.csv', index=False)
+    print("Players merged with games and saved to test_dataset_players.csv")
 
-get_player_logs()
-format_logs()
-add_last_5()
-merge_players_with_games()
+get_starting_fives() #DONE - nba_starting_lineups.csv
+get_player_logs() #DONE - team_player_performance.csv
+format_logs() #DONE - players_stats_24-25_final.csv
+add_last_5()  #DONE - players_stats_with_last_5.csv
+merge_players_with_games() #DONE - test_dataset_players.csv
 
 
 
