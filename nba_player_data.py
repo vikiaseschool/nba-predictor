@@ -1,7 +1,6 @@
 import csv
 from nba_api.stats.static import players, teams
 import pandas as pd
-import os
 import time
 from nba_api.stats.endpoints import PlayerGameLog
 
@@ -237,11 +236,6 @@ def get_starting_fives():
         team = [team for team in nba_teams if team['full_name'] == team_name][0]
         return team['id']
 
-    def get_name(team_id):
-        nba_teams = teams.get_teams()
-        team = [team for team in nba_teams if team['id'] == team_id][0]
-        return team['full_name']
-
     csv_data = []
 
     for team in players_data:
@@ -275,44 +269,55 @@ def get_starting_fives():
         writer.writerows(csv_data)
     print(f"Data has been saved to {csv_file}")
 
-#ziskava logy hracu za celou sezonu
+#ziskava logy hracu za celou sezonu 2023-24 a 2024-25
 def get_player_logs():
-    def create_team_player_performance(input_csv, output_csv, team_name):
+    def create_team_player_performance(input_csv, team_name):
         try:
             lineup_data = pd.read_csv(input_csv)
             team_players = lineup_data[lineup_data['TEAM_NAME'] == team_name]
             player_ids = team_players['PLAYER_ID'].tolist()
+            team_id_map = team_players.set_index('PLAYER_ID')['TEAM_ID'].to_dict()  # Precompute mapping
         except Exception as e:
             print(f"Error reading input file: {e}")
-            return
+            return None
+
         print(player_ids)
 
+        seasons = ['2023-24', '2024-25']
         all_player_stats = []
 
-        # API was not working as i wanted, it was not returning any data; timeout error
         for player_id in player_ids:
-            print(f"Processing Player ID: {player_id}, Season: 2024-25, Team: {team_name}")
-            for attempt in range(3):
-                try:
-                    game_logs = PlayerGameLog(player_id=player_id, season='2024-25').get_data_frames()[0]
-                    all_player_stats.append(game_logs)
-                    print(all_player_stats)
-                    break
-                except Exception as e:
-                    print(f"Error fetching data for Player ID {player_id}, Season 2024-25: {e}")
-                    time.sleep(5)
+            for season in seasons:
+                for attempt in range(3):
+                    try:
+                        game_logs = PlayerGameLog(player_id=player_id, season=season).get_data_frames()[0]
+                        game_logs['TEAM_ID'] = team_id_map.get(player_id, None)  # Map TEAM_ID efficiently
+                        all_player_stats.append(game_logs)
+                        break
+                    except Exception as e:
+                        print(f"Error fetching data for Player ID {player_id}, Season {season}, attemp {attempt+1}: {e}")
+                        time.sleep(5)
 
         if all_player_stats:
-            combined_stats = pd.concat(all_player_stats, ignore_index=True)
-
-            combined_stats.to_csv(output_csv, mode='a', header=not os.path.exists(output_csv), index=False)
-            print(f"Team player performance saved to {output_csv}")
+            return pd.concat(all_player_stats, ignore_index=True)
         else:
             print("No player data retrieved. Please check your inputs or API connectivity.")
+            return None
 
-    create_team_player_performance("nba_starting_lineups.csv", "team_player_performance.csv", "Washington Wizards")
+    stats = []
+    for team in teams.get_teams():
+        team_name = team['full_name']
+        print(f"Getting player logs for {team_name}")
+        combined_stats = create_team_player_performance("nba_starting_lineups.csv", team_name)
+        if combined_stats is not None:
+            stats.append(combined_stats)
 
-#formatuje logy do finalni podoby
+    # Save the final combined DataFrame to CSV
+    if stats:
+        final_stats = pd.concat(stats, ignore_index=True)
+        final_stats.to_csv("team_player_performance.csv", index=False)
+        print("All team player performances saved to CSV.")
+
 def format_logs():
     def get_player_name(player_id):
         all_players = players.get_players()
@@ -323,12 +328,90 @@ def format_logs():
             return "Player not found"
 
     logs = pd.read_csv("team_player_performance.csv")
-    logs['PLAYER_NAME'] = logs['Player_ID'].apply(get_player_name)  # Apply function to each player_id
+    logs = logs.drop_duplicates()
+    logs['PLAYER_NAME'] = logs['Player_ID'].apply(get_player_name)
+
     logs['GAME_DATE'] = pd.to_datetime(logs['GAME_DATE'], format='%b %d, %Y').dt.strftime('%Y-%m-%d')
     logs['WL'] = logs['WL'].replace({'W': 1, 'L': 0})
+
     logs = logs.drop(columns=['VIDEO_AVAILABLE', 'MATCHUP'])
+    logs.rename(columns={'Player_ID': 'PLAYER_ID'}, inplace=True)
+    logs.rename(columns={'Game_ID': 'GAME_ID'}, inplace=True)
 
     logs.to_csv("players_stats_24-25_final.csv", index=False)
+    print("Logs formatted and saved to players_stats_24-25_final.csv")
+
+def add_last_5():
+    player_data = pd.read_csv("players_stats_24-25_final.csv")
+    stats_to_average = [
+        "WL", "MIN", "FGM", "FGA", "FG_PCT", "FG3M", "FG3A", "FG3_PCT",
+        "FTM", "FTA", "FT_PCT", "OREB", "DREB", "REB", "AST", "STL",
+        "BLK", "TOV", "PF", "PTS", "PLUS_MINUS"
+    ]
+
+    last_5_stats = pd.DataFrame(index=player_data.index)
+    grouped = player_data.groupby("PLAYER_ID")
+    #optimalized via GitHub Copilot
+    for player_id, group in grouped:
+        group = group.sort_values(by="GAME_DATE", ascending=False)
+        rolling_stats = (group[stats_to_average].rolling(window=5, min_periods=1).mean().shift(0))
+        for stat in stats_to_average:
+            last_5_stats.loc[group.index, f"LAST_5_{stat}"] = rolling_stats[stat]
+    #end of AI optimalization
+    player_data = pd.concat([player_data, last_5_stats], axis=1)
+
+    player_data.to_csv("players_stats_with_last_5.csv", index=False)
+    print("Last 5 games averages added to players_stats_with_last_5.csv")
+
+def merge_players_with_games():
+    players = pd.read_csv("players_stats_with_last_5.csv")
+    games = pd.read_csv("test_dataset.csv")
+
+    # Filter games to only include data from 2023-10-01 and newer
+    games['GAME_DATE'] = pd.to_datetime(games['GAME_DATE'])
+    games = games[games['GAME_DATE'] >= '2023-10-01']
+
+    # Create an empty list for the final merged data
+    merged_data = []
+
+    # Iterate through the players
+    for _, player_row in players.iterrows():
+        player_team_id = player_row['TEAM_ID']
+        player_game_date = player_row['GAME_DATE']
+
+        # Filter matching games
+        matched_games = games[(games['GAME_DATE'] == player_game_date) & (games['TEAM_ID'] == player_team_id)]
+
+        if not matched_games.empty:
+            # If TEAM_ID matches, add the stats as MATCH_{original_column_name}
+            for _, game_row in matched_games.iterrows():
+                new_row = player_row.copy()
+                for col in game_row.index:
+                    if 'OPP' not in col:
+                        new_row[f'MATCH_{col}'] = game_row[col]
+                merged_data.append(new_row)
+        else:
+            # If TEAM_ID does not match, add opponent's stats
+            for _, game_row in matched_games.iterrows():
+                new_row = player_row.copy()
+                new_row['SEASON_ID'] = game_row['SEASON_ID']
+                new_row['GAME_ID'] = game_row['GAME_ID']
+                new_row['MATCHUP'] = game_row['MATCHUP']
+                for col in game_row.index:
+                    if 'OPP' in col:
+                        new_row[f'MATCH_{col.replace("OPP_", "")}'] = game_row[col]
+                merged_data.append(new_row)
+
+    # Convert merged data into a DataFrame
+    merged_df = pd.DataFrame(merged_data)
+
+    # Save to CSV
+    merged_df.to_csv('test_dataset_players.csv', index=False)
+
+get_player_logs()
+format_logs()
+add_last_5()
+merge_players_with_games()
 
 
 
