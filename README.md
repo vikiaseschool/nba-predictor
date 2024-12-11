@@ -43,17 +43,20 @@ This project is an NBA results predictor that uses machine learning models to pr
 
 ## Model accuracy test results
 
-- Accuracy of WL prediction: 58%
+- Accuracy of Win/lose prediction: 58%
 - false win/lose [190 202], correct win/lose [191 329]
-- Mean Squared Error for PTS prediction: 163.0
-- Mean Squared Error for PTS_O prediction: 162.3
-- Average percentage deviation for PTS: 9.1%
-- Average percentage deviation for PTS_O: 9.2%
+- Mean Squared Error for PTS team 1 prediction: 163.0
+- Mean Squared Error for PTS team 2 prediction: 162.3
+- Average percentage deviation for PTS team 1: 9.1%
+- Average percentage deviation for PTS team 2: 9.2%
+- Average percentage deviation for PTS player: 13.4%
+- Average percentage deviation for AST player: 12.1%
+- Average percentage deviation for REB player: 18% (rebounds are really hard to predict, many players have under 3 in a game...)
 
 ## UPDATE DESCRIPTIONS
 **V2 changes**
 - made the project public via vercel
-- added player points prediction
+- added player points, assists and rebounds prediction
    - trained new model
 
 **V1.1 changes**
