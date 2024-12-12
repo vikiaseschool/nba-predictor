@@ -395,6 +395,7 @@ def merge_players_with_games():
                         new_row[f'MATCH_{col}'] = game_row[col]
                 merged_data.append(new_row)
         else:
+            matched_games = games[(games['GAME_DATE'] == player_game_date) & (games['OPP_TEAM_ID'] == player_team_id)]
             for _, game_row in matched_games.iterrows():
                 new_row = player_row.copy()
                 new_row['SEASON_ID'] = game_row['SEASON_ID']
@@ -411,11 +412,13 @@ def merge_players_with_games():
     merged_df.to_csv('test_dataset_players.csv', index=False)
     print("Players merged with games and saved to test_dataset_players.csv")
 
-get_starting_fives() #DONE - nba_starting_lineups.csv
-get_player_logs() #DONE - team_player_performance.csv
-format_logs() #DONE - players_stats_24-25_final.csv
-add_last_5()  #DONE - players_stats_with_last_5.csv
-merge_players_with_games() #DONE - test_dataset_players.csv
+#get_starting_fives() DONE - nba_starting_lineups.csv
+#get_player_logs() DONE - team_player_performance.csv
+#format_logs() DONE - players_stats_24-25_final.csv
+#add_last_5()  DONE - players_stats_with_last_5.csv
+#merge_players_with_games() DONE - test_dataset_players.csv
+
+
 
 
 
