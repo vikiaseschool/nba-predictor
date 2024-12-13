@@ -223,7 +223,6 @@ def get_player_csv_ready(team_name, opp_team_name, date):
         merged_df.to_csv('match_ready_players.csv', index=False)
     merge()
 
-
 def get_prediction(team_name, opp_team_name, date):
     team_id = get_id(team_name)
     opp_team_id = get_id(opp_team_name)
@@ -282,7 +281,18 @@ def get_prediction(team_name, opp_team_name, date):
     reb_pred = round_list(reb_pred)
     ast_pred = round_list(ast_pred)
 
-    return int(wl_prediction[0]), round(float(pts_prediction[0])), round(float(opp_pts_prediction[0])), pts_pred, ast_pred, reb_pred
+    player_names = []
+    player_names.extend(data['PLAYER_NAME'].tolist())
+
+    def is_home_team():
+        df = pd.read_csv('match_ready_players.csv', nrows=1)
+        if df.loc[0, 'TEAM_NAME'] == team_name:
+            return True
+        else:
+            return False
+
+    first_is_home = is_home_team()
+    return int(wl_prediction[0]), round(float(pts_prediction[0])), round(float(opp_pts_prediction[0])), pts_pred, ast_pred, reb_pred, player_names, first_is_home
 def get_stats(team_name, opp_team_name, date):
     games_df = pd.read_csv('combined_games_2021_2025.csv')
     match_df = pd.read_csv('match_info.csv')
