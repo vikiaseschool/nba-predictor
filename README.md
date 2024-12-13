@@ -57,7 +57,7 @@ Player predictions:
 
 ## UPDATE DESCRIPTIONS
 **V2.0 changes**
-- made the project public via vercel
+- made the project public via nest hosting
 - added player points, assists and rebounds prediction
    - trained new model
 - added feedback form
