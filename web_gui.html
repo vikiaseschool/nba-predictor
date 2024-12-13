@@ -16,6 +16,15 @@
             background-color: #f4f4f9;
         }
 
+        .app-logo {
+            width: 100px;
+            height: auto;
+            margin-bottom: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            object-fit: cover;
+        }
+
         h1 {
             font-size: 28px;
             margin: 20px;
@@ -82,7 +91,6 @@
             text-align: center;
         }
 
-        /* Fix for responsiveness */
         @media (max-width: 768px) {
             h1 {
                 font-size: 24px;
@@ -100,18 +108,39 @@
                 width: 25px;
                 height: 25px;
             }
+
+            .app-logo {
+                width: 80px;
+            }
         }
     </style>
 </head>
 <body>
 
-    <!-- Title Section -->
-    <h1>NBA Results Predictor</h1>
+    <img src="{{ url_for('static', filename='logos/app_logo.jpg') }}" alt="App Logo" class="app-logo">
 
-    <!-- Form for Team Selection -->
+    <h1>NBA Results Predictor</h1>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-messages">
+                {% for category, message in messages %}
+                    {% if category == 'error' %}
+                        <div class="flash-error">
+                            <strong>Error:</strong> {{ message }}
+                        </div>
+                    {% else %}
+                        <div class="flash-message {{ category }}">
+                            {{ message }}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
     <div class="form-container">
         <form action="/nextpage" method="POST">
-            <!-- Home Team Selection -->
+
             <div class="team-container">
                 <label for="team1">Home Team</label>
                 <select id="team1" name="team1" onchange="showLogo('team1')">
@@ -123,7 +152,6 @@
                 <img id="logo1" class="logo" src="" alt="Home Team Logo">
             </div>
 
-            <!-- Away Team Selection -->
             <div class="team-container">
                 <label for="team2">Away Team</label>
                 <select id="team2" name="team2" onchange="showLogo('team2')">
@@ -135,20 +163,17 @@
                 <img id="logo2" class="logo" src="" alt="Away Team Logo">
             </div>
 
-            <!-- Date Selection -->
             <div class="team-container">
                 <label for="date">Select Date</label>
                 <input type="date" id="date" name="date">
             </div>
 
-            <!-- Proceed Button -->
             <button type="submit">Proceed</button>
         </form>
     </div>
 
-    <!-- Footer Section -->
     <footer>
-        <p>V1.1</p>
+        <p>V2.0</p>
         <p>Model made and tested by @vikiase</p>
     </footer>
 
@@ -163,11 +188,10 @@
                 logoElement.src = "/static/logos/" + formattedTeamName;
                 logoElement.style.display = "inline"; // Show the logo
             } else {
-                logoElement.style.display = "none"; // Hide the logo if no team is selected
+                logoElement.style.display = "none";
             }
         }
 
-        // Function to select random teams on page load
         function selectRandomTeams() {
             var teams = Array.from(document.querySelectorAll('#team1 option')).map(option => option.value).filter(value => value !== "");
             if (teams.length > 1) {
@@ -184,8 +208,6 @@
                 showLogo('team2');
             }
         }
-
-        // Run the random team selection when the page loads
         window.onload = selectRandomTeams;
     </script>
 
