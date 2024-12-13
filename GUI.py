@@ -1,4 +1,5 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
+import json
 from datetime import datetime
 import main
 
@@ -130,6 +131,16 @@ def player_prediction():
     return render_template('player_prediction.html', home_team=home_team, away_team=away_team, date=date,
                             home_players=home_players, away_players=away_players, home_pts=home_pts, away_pts=away_pts,
                             home_reb=home_reb, away_reb=away_reb, home_ast=home_ast, away_ast=away_ast, is_home=is_home)
+
+@app.route('/submit_feedback', methods=['POST'])
+def submit_feedback():
+    feedback_data = request.get_json()
+    with open('reviews.txt', 'a') as file:
+        file.write(json.dumps(feedback_data) + '\n')
+    return jsonify({"message": "Feedback submitted successfully!"})
+
+if __name__ == '__main__':
+    app.run(debug=True)
 
 if __name__ == '__main__':
     app.run(debug=True)
