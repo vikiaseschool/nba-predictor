@@ -113,6 +113,78 @@
             text-align: center;
         }
 
+        /* Feedback Button Styling */
+        #feedback-btn {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            padding: 15px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        #feedback-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .rating input {
+            margin-right: 5px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        .modal-content button {
+            margin-top: 10px;
+            margin-bottom: 10px;
+            width: 100%;
+            max-width: 200px;
+        }
+
+        #feedback-form button {
+            display: block;
+            width: 100%;
+            max-width: 200px;
+            margin: 20px auto;
+        }
+
         @media (max-width: 768px) {
             .team-container {
                 flex-direction: column;
@@ -169,8 +241,81 @@
         </a>
     </div>
 
+    <button id="feedback-btn">
+        Send Feedback!
+    </button>
+
+    <div id="feedback-modal">
+        <div class="modal-content">
+            <h2>Leave Your Feedback</h2>
+            <form id="feedback-form">
+                <label for="name">Name (Optional):</label>
+                <input type="text" id="name" name="name"><br><br>
+
+                <label>Rating min > max (Required):</label><br>
+
+                <div class="rating">
+                    <input type="radio" id="star1" name="rating" value="1"><label for="star1">1</label>
+                    <input type="radio" id="star2" name="rating" value="2"><label for="star2">2</label>
+                    <input type="radio" id="star3" name="rating" value="3"><label for="star3">3</label>
+                    <input type="radio" id="star4" name="rating" value="4"><label for="star4">4</label>
+                    <input type="radio" id="star5" name="rating" value="5"><label for="star5">5</label>
+                </div>
+                <br><br>
+                <label for="comment">Comment (Optional):</label><br>
+                <textarea id="comment" name="comment" rows="4" cols="50"></textarea><br><br>
+
+                <button type="submit">Submit Feedback</button>
+            </form>
+            <button id="close-modal">Close</button>
+        </div>
+    </div>
+
     <footer>
         <p>V2.0 Models made and tested by @vikiase</p>
     </footer>
+
+    <script>
+        document.getElementById('feedback-btn').addEventListener('click', function() {
+            document.getElementById('feedback-modal').style.display = 'flex';
+        });
+
+        document.getElementById('close-modal').addEventListener('click', function() {
+            document.getElementById('feedback-modal').style.display = 'none';
+        });
+
+        document.getElementById('feedback-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const name = document.getElementById('name').value;
+            const rating = document.querySelector('input[name="rating"]:checked')?.value;
+            const comment = document.getElementById('comment').value;
+
+            if (!rating) {
+                alert("Please add a rating!");
+                return;
+            }
+
+            const feedback = { name, rating, comment };
+
+            fetch('/submit_feedback', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(feedback)
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                document.getElementById('feedback-form').reset();
+                document.getElementById('feedback-modal').style.display = 'none';
+            })
+            .catch(error => {
+                alert('Error submitting feedback!');
+                console.error('Error:', error);
+            });
+        });
+    </script>
 </body>
 </html>
