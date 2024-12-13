@@ -1,4 +1,4 @@
-# NBA Results Predictor V2
+# NBA Results Predictor V2.0
 
 ## WARNING!
 
@@ -6,7 +6,7 @@ this application is only for educational purposes, please don't use it for betti
 
 ## Use of AI
 
-I used ChatGpt and Github copilot extension. Some parts (I think like 10-20%) of my code are optimalized by AI, usually when operating with large datasets or model training optimalization. Also some comments or code parts are upgraded by AI to make the code readable and structuable, but it is a minority of the code.
+I used ChatGpt and Github copilot extension. Some parts (I think like 10-20%) of my code are optimalized by AI, usually when operating with large datasets, model training optimalization or some GUI optimalization. Also some comments or code parts are upgraded by AI to make the code readable and structuable, but it is a minority of the code.
 
 ## Overview
 
@@ -28,7 +28,7 @@ This project is an NBA results predictor that uses machine learning models to pr
 - `players_training.py`: Script to train the machine learning models for predicting starting five players statistics.
 - `results_training.py`: Script to train the machine learning models for predicting game outcomes and scores.
 - `templates/web_gui.html`: HTML template for the main input form.
-- `templates/result.html`: HTML template for displaying the prediction results.
+- `templates/result.html`: HTML template for displaying the prediction results and feedback form.
 - `templates/statistics.html`: HTML template for displaying the game statistics.
 
 ## Requirements
@@ -42,22 +42,26 @@ This project is an NBA results predictor that uses machine learning models to pr
 - imbalanced-learn
 
 ## Model accuracy test results
-
+Match predictions:
 - Accuracy of Win/lose prediction: 58%
 - false win/lose [190 202], correct win/lose [191 329]
 - Mean Squared Error for PTS team 1 prediction: 163.0
 - Mean Squared Error for PTS team 2 prediction: 162.3
 - Average percentage deviation for PTS team 1: 9.1%
 - Average percentage deviation for PTS team 2: 9.2%
-- Average percentage deviation for PTS player: 13.4%
-- Average percentage deviation for AST player: 12.1%
-- Average percentage deviation for REB player: 18% (rebounds are really hard to predict, many players have under 3 in a game...)
+
+Player predictions:
+- Points (PTS) R2 Score: 58.31%
+- Rebounds (REB) R2 Score: 61.56%
+- Assists (AST) R2 Score: 62.27%
 
 ## UPDATE DESCRIPTIONS
-**V2 changes**
+**V2.0 changes**
 - made the project public via vercel
 - added player points, assists and rebounds prediction
    - trained new model
+- added feedback form
+- made the GUI prettier
 
 **V1.1 changes**
 - repaired datasets, data are now more precise
